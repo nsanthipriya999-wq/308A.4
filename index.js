@@ -1,8 +1,10 @@
 //import { start } from "node:repl";
+//import { ifError } from "node:assert";
 import * as Carousel from "./Carousel.js";
 import { API_KEY } from "./keys.js";
 export async function favourite(id) {
   try {
+  
     console.log("Favourite:", id);
 
 
@@ -37,7 +39,7 @@ const infoDump = document.getElementById("infoDump");
 const progressBar = document.getElementById("progressBar");
 // The get favourites button element.
 const favBtn = document.getElementById("getFavouritesBtn");
-favBtn.classList.toggle("active");
+
 
 // Step 0: Store your API key in the keys.js file.
 
@@ -293,6 +295,29 @@ onDownloadProgress:updateProgess
  *    repeat yourself in this section.
  */
 
+//get favourites
+
+async function getFavourites()
+{
+  try{
+Carousel.clear();
+const response=await axios.get("/favourites");
+console.log("Favourites:",response.data);
+const pics=response.data.map(fav=>({url:fav.image?.url,
+  id:fav.image_id,
+  breeds:fav.image?.breeds||[]
+}));
+buildCarousel(pics);
+Carousel.start();
+  }catch(error){
+    console.error("Failed to display Favourites",error);
+  }
+
+  }
+
+
+  //event listener for getFavourites()
+  favBtn.addEventListener("click",getFavourites);
 /**
  * 10. Test your site, thoroughly!
  * - What happens when you try to load the Malayan breed?
