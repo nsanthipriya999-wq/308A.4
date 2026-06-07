@@ -1,3 +1,5 @@
+
+//-----------------------------------Fetch--------------------------------------------------------------------
 import * as Carousel from "./Carousel.js";
 import { API_KEY } from "./keys.js";
 export function favourite(id){}
@@ -103,6 +105,7 @@ async function getBreed(breedId) {
   }
 
 }
+//-------------------------------Function to Display Carousel pics-----------------------------
 
 function buildCarousel(pics) {
   pics.forEach((pic) => {

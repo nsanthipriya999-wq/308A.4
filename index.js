@@ -1,3 +1,5 @@
+
+//-----------------------------------AXIOS------------------------------------------------------------------
 //import { start } from "node:repl";
 //import { ifError } from "node:assert";
 import * as Carousel from "./Carousel.js";
@@ -26,11 +28,8 @@ export async function favourite(id) {
     console.error("Favourite error:", error)
   }
 }
-//display favourites
 
-//import axios from "Axios";
 console.log("axios =", axios);
-console.log("axios.interceptors =", axios?.interceptors);
 // The breed selection input element.
 const breedSelect = document.getElementById("breedSelect");
 // The information section div element.
@@ -52,7 +51,7 @@ const favBtn = document.getElementById("getFavouritesBtn");
  * This function should execute immediately.
  * 
  */
-//---------------start of fetch code------------------------------------------------
+//---------------Function initialLoad to retrieve list of breeds-----------------------------------------------
 async function initialLoad() {
 
   try {
@@ -77,14 +76,13 @@ async function initialLoad() {
 }
 
 
-
 //-------------------default headers--------------------------
 axios.defaults.headers.common["x-api-key"] = API_KEY;
 
 //-------------------default base URL---------------------------
 
 axios.defaults.baseURL = "https://api.thecatapi.com/v1/"
-//initialLoad();
+
 
 
 /**
@@ -101,25 +99,23 @@ axios.defaults.baseURL = "https://api.thecatapi.com/v1/"
  * - Each new selection should clear, re-populate, and restart the Carousel.
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
-//Event-handler  for breedSelect
+//----------------------Event-handler  for breedSelect-------------------------------------------------
 
 breedSelect.addEventListener("change", async (e) => {
   getBreed(e.target.value);
 });
 
+//-----------------------------------------Function getBreed---------------------------------------
 async function getBreed(breedId) {
 
   try {
 
     Carousel.clear();
-    //Carousel.start();
-    //const breedId = e.target.value;
-    //console.log("PIC OBJECT:", pics[0]);
     const response = await axios.get("/images/search",
       {
         params: {
           breed_ids: breedId,
-          limit: 10
+          limit:18
         }, onDownloadProgress: updateProgess
       });
 
@@ -143,7 +139,7 @@ async function getBreed(breedId) {
   }
 
 }
-
+//-------------------------------------Build Carousel--------------------------------------------------------
 function buildCarousel(pics) {
   pics.forEach((pic) => {
     const carouselItem = Carousel.createCarouselItem(
@@ -157,7 +153,7 @@ function buildCarousel(pics) {
 }
 
 
-//--------------------------end of fetch -code-----------------------------------------
+
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
  */
@@ -187,7 +183,7 @@ function buildCarousel(pics) {
 * - As an added challenge, try to do this on your own without referencing the lesson material.
 */
 
-
+//------------------------Axios interceptors------------------------------------------------------
 
 axios.interceptors.request.use((config) => {
   console.log("Request started");
@@ -223,9 +219,7 @@ axios.interceptors.response.use(
   }
 );
 
-/*axios.get("/breeds")
-  .then(res => console.log(res.data))
-  .catch(err => console.log(err));*/
+
 /**
 * 6. Next, we'll create a progress bar to indicate the request is in progress.
 * - The progressBar element has already been created for you.
@@ -241,8 +235,7 @@ axios.interceptors.response.use(
 *   once or twice per request to this API. This is still a concept worth familiarizing yourself
 *   with for future projects.
 */
-/*progressBar.style.width=0%;
-document.body.style.cursor="progress"*/
+//---------------------Function updateProgress----------------------------------------------------
 
 function updateProgess(e) {
   /* const loaded=e.loaded;
@@ -256,14 +249,12 @@ function updateProgess(e) {
   }
   else {
 
-    console.log("No total Value,progress loading");
+    console.log("No total Value,progress loading");    //If no total value ,set the progress bar width at 40%
     progressBar.style.width = "40%";
   }
 }
 
-/*axios.get("/breeds",{
-onDownloadProgress:updateProgess
-});*/
+
 
 /**
  * 7. As a final element of progress indication, add the following to your axios interceptors:
@@ -281,10 +272,7 @@ onDownloadProgress:updateProgess
  *   you delete that favourite using the API, giving this function "toggle" functionality.
  * - You can call this function by clicking on the heart at the top right of any image.
  */
-//export async function favourite(id){
-// console.log("favourite:",id);
-//}
-//favourite();
+
 /**
  * 9. Test your favourite() function by creating a getFavourites() function.
  * - Use Axios to get all of your favourites from the cat API.
@@ -295,7 +283,7 @@ onDownloadProgress:updateProgess
  *    repeat yourself in this section.
  */
 
-//get favourites
+//-----------------------------get favourites-function to display Favourites---------------------------------------------
 
 async function getFavourites()
 {
@@ -316,7 +304,7 @@ Carousel.start();
   }
 
 
-  //event listener for getFavourites()
+  //-----------------------------------event listener for getFavourites()---------------------------------
   favBtn.addEventListener("click",getFavourites);
 /**
  * 10. Test your site, thoroughly!
