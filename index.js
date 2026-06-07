@@ -1,7 +1,30 @@
 //import { start } from "node:repl";
 import * as Carousel from "./Carousel.js";
 import { API_KEY } from "./keys.js";
-export function favourite(id){}
+export async function favourite(id) {
+  try {
+    console.log("Favourite:", id);
+
+
+    const response = await axios.get("/favourites");
+    const isFavourite = response.data.find(fav => fav.image_id === id);
+
+    if (isFavourite) {
+      await axios.delete(`/favourites/${isFavourite.id}`);
+      console.log(`Favourite with id ${isFavourite.id} is deleted`);
+    }
+    else {
+      console.log("Not favourited, doing now");
+      await axios.post("/favourites",
+        { image_id: id }
+      );
+      console.log("Favourite added");
+    }
+  } catch (error) {
+    console.error("Favourite error:", error)
+  }
+}
+//display favourites
 
 //import axios from "Axios";
 console.log("axios =", axios);
@@ -14,6 +37,7 @@ const infoDump = document.getElementById("infoDump");
 const progressBar = document.getElementById("progressBar");
 // The get favourites button element.
 const favBtn = document.getElementById("getFavouritesBtn");
+favBtn.classList.toggle("active");
 
 // Step 0: Store your API key in the keys.js file.
 
@@ -30,20 +54,20 @@ const favBtn = document.getElementById("getFavouritesBtn");
 async function initialLoad() {
 
   try {
-    const response = await axios.get(("/breeds"),{
- onDownloadProgress:updateProgess
- });
-      
+    const response = await axios.get(("/breeds"), {
+      onDownloadProgress: updateProgess
+    });
+
     const breeds = response.data;
-    console.log("breeds:",breeds);
+    console.log("breeds:", breeds);
     breeds.forEach((breed) => {
       const option = document.createElement("option");
       option.value = breed.id;
       option.textContent = breed.name;
       breedSelect.appendChild(option);
     });
-    if(breeds.length>0)
-    await getBreed(breeds[0].id);
+    if (breeds.length > 0)
+      await getBreed(breeds[0].id);
   }
   catch (error) {
     console.error("unable to fetch breeds:", error);
@@ -52,12 +76,12 @@ async function initialLoad() {
 
 
 
-  //-------------------default headers--------------------------
- axios.defaults.headers.common["x-api-key"]=API_KEY;
+//-------------------default headers--------------------------
+axios.defaults.headers.common["x-api-key"] = API_KEY;
 
-  //-------------------default base URL---------------------------
+//-------------------default base URL---------------------------
 
-   axios.defaults.baseURL="https://api.thecatapi.com/v1/"
+axios.defaults.baseURL = "https://api.thecatapi.com/v1/"
 //initialLoad();
 
 
@@ -88,16 +112,17 @@ async function getBreed(breedId) {
     Carousel.clear();
     //Carousel.start();
     //const breedId = e.target.value;
+    //console.log("PIC OBJECT:", pics[0]);
     const response = await axios.get("/images/search",
       {
         params: {
-          breed_ids:breedId,
-          limit:10
-        },onDownloadProgress:updateProgess
+          breed_ids: breedId,
+          limit: 10
+        }, onDownloadProgress: updateProgess
       });
 
     //-------------------display cat pics---------------------------------------------------
-    const pics=response.data;
+    const pics = response.data;
     buildCarousel(pics);
     const breedPic = pics[0]?.breeds[0];
     if (breedPic) {
@@ -122,14 +147,14 @@ function buildCarousel(pics) {
     const carouselItem = Carousel.createCarouselItem(
       pic.url,
       "Cat image",
-      pic.id
+      pic.id || pic.url
     );
 
     Carousel.appendCarousel(carouselItem);
   });
 }
 
-  
+
 //--------------------------end of fetch -code-----------------------------------------
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
@@ -146,13 +171,13 @@ function buildCarousel(pics) {
  *   send it manually with all of your requests! You can also set a default base URL!
  */
 
-  //-------------------default headers--------------------------
- // axios.defaults.headers.common["x-api-key"]=API_KEY;
+//-------------------default headers--------------------------
+// axios.defaults.headers.common["x-api-key"]=API_KEY;
 
-  //-------------------default base URL---------------------------
+//-------------------default base URL---------------------------
 
-   //axios.defaults.baseURL="https://api.thecatapi.com/v1/"
-  
+//axios.defaults.baseURL="https://api.thecatapi.com/v1/"
+
 /**
 * 5. Add axios interceptors to log the time between request and response to the console.
 * - Hint: you already have access to code that does this!
@@ -162,37 +187,38 @@ function buildCarousel(pics) {
 
 
 
-axios.interceptors.request.use((config)=>{
-  console.log( "Request started");
-  config.metadata={
-              startTime:new Date()
-            }
- console.log("Request started at:", config.metadata.startTime );
-progressBar.style.width="0%";
-document.body.style.cursor="progress";
-return config;
-  });
- 
-  axios.interceptors.response.use(
+axios.interceptors.request.use((config) => {
+  console.log("Request started");
+  config.metadata = {
+    startTime: new Date()
+  }
+  console.log("Request started at:", config.metadata.startTime);
+  progressBar.style.width = "0%";
+  document.body.style.cursor = "progress";
+  return config;
+});
+
+axios.interceptors.response.use(
   (response) => {
-    const endTime=new Date();
-    console.log("request ended at :" ,endTime);
-    if(response.config.metadata.startTime){
-    const duration=endTime-response.config.metadata.startTime;
-    console.log("Request Duration is:", duration);}
-    progressBar.style.width="100%";
-    document.body.style.cursor="default";
+    const endTime = new Date();
+    console.log("request ended at :", endTime);
+    if (response.config.metadata.startTime) {
+      const duration = endTime - response.config.metadata.startTime;
+      console.log("Request Duration is:", duration);
+    }
+    progressBar.style.width = "100%";
+    document.body.style.cursor = "default";
     return response;
-  
 
-     },
 
-(error)=>{
-  console.log("failed")
-  progressBar.style.width="100%";
-    document.body.style.cursor="default";
+  },
+
+  (error) => {
+    console.log("failed")
+    progressBar.style.width = "100%";
+    document.body.style.cursor = "default";
     return Promise.reject(error);
-}
+  }
 );
 
 /*axios.get("/breeds")
@@ -216,28 +242,26 @@ return config;
 /*progressBar.style.width=0%;
 document.body.style.cursor="progress"*/
 
-function updateProgess(e)
-{
- /* const loaded=e.loaded;
-  const total=e.total;*/
-  const {loaded,total}=e;
-  if(total){
-  console.log("Total is:",total)
-  const percent=Math.round(loaded*100/total);
-  progressBar.style.width= percent+"%";
-  console.log("progress bar:",percent+"%");
+function updateProgess(e) {
+  /* const loaded=e.loaded;
+   const total=e.total;*/
+  const { loaded, total } = e;
+  if (total) {
+    console.log("Total is:", total)
+    const percent = Math.round(loaded * 100 / total);
+    progressBar.style.width = percent + "%";
+    console.log("progress bar:", percent + "%");
   }
-  else
-  {
-    
-  console.log("No total Value,progress loading");
-  progressBar.style.width="40%";
+  else {
+
+    console.log("No total Value,progress loading");
+    progressBar.style.width = "40%";
   }
 }
 
- /*axios.get("/breeds",{
- onDownloadProgress:updateProgess
- });*/
+/*axios.get("/breeds",{
+onDownloadProgress:updateProgess
+});*/
 
 /**
  * 7. As a final element of progress indication, add the following to your axios interceptors:
@@ -255,8 +279,10 @@ function updateProgess(e)
  *   you delete that favourite using the API, giving this function "toggle" functionality.
  * - You can call this function by clicking on the heart at the top right of any image.
  */
-
-
+//export async function favourite(id){
+// console.log("favourite:",id);
+//}
+//favourite();
 /**
  * 9. Test your favourite() function by creating a getFavourites() function.
  * - Use Axios to get all of your favourites from the cat API.
